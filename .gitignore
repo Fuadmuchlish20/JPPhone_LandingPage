@@ -1,0 +1,13 @@
+node_modules
+.next
+dist
+.env
+.env.local
+*.log
+.DS_Store
+infra/host/.env
+infra/supabase/.temp
+apps/web/public/broadway/*
+!apps/web/public/broadway/.gitkeep
+*.tsbuildinfo
+apps/web/next-env.d.ts

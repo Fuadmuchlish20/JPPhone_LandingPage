@@ -1,0 +1,21 @@
+{
+  "name": "claudeemulator",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @ce/web",
+    "dev:agent": "npm run dev -w @ce/device-agent",
+    "build:web": "npm run build -w @ce/web",
+    "build:agent": "npm run build -w @ce/device-agent",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

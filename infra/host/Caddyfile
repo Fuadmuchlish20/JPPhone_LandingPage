@@ -1,0 +1,32 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$HOST_DOMAIN} {
+	# Browser APK upload (short-lived JWT, not HMAC)
+	@apk path_regexp apk ^/api/devices/[0-9a-f-]{36}/install-apk$
+
+	# Agent REST API: HMAC-signed by the web app. Optionally also restrict by IP
+	# via AGENT_API_ALLOWED_IPS if your web backend has fixed egress IPs.
+	@api_blocked {
+		path /api/*
+		not path_regexp ^/api/devices/[0-9a-f-]{36}/install-apk$
+		not remote_ip {$AGENT_API_ALLOWED_IPS:0.0.0.0/0 ::/0}
+	}
+	respond @api_blocked 403
+
+	request_body @apk {
+		max_size 520MB
+	}
+
+	# /stream/<deviceId> (WebSocket) and /api/* -> device-agent
+	reverse_proxy 127.0.0.1:8080 {
+		flush_interval -1
+		stream_close_delay 5m
+	}
+
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000"
+	}
+}

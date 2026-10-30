@@ -1,0 +1,28 @@
+{
+  "name": "@ce/device-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --format=esm --outfile=dist/index.js --packages=external --alias:@ce/shared=../../packages/shared/src",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ce/shared": "*",
+    "@supabase/supabase-js": "2.118.0",
+    "busboy": "1.6.0",
+    "dockerode": "5.0.1",
+    "jose": "6.2.12",
+    "ws": "8.22.0"
+  },
+  "devDependencies": {
+    "@types/busboy": "1.5.5",
+    "@types/dockerode": "4.0.2",
+    "@types/node": "22.20.5",
+    "@types/ws": "8.18.2",
+    "esbuild": "0.28.2",
+    "tsx": "4.23.15"
+  }
+}

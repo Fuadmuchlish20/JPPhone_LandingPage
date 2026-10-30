@@ -1,0 +1,46 @@
+# Per-host stack: device-agent + Caddy (TLS). Run from infra/host:
+#   cp .env.example .env && docker compose up -d --build
+# Redroid device containers are created by the agent, not by this file.
+
+services:
+  device-agent:
+    build:
+      context: ../..
+      dockerfile: apps/device-agent/Dockerfile
+      args:
+        SCRCPY_VERSION: ${SCRCPY_VERSION:-3.3.1}
+    image: claudeemulator/device-agent:latest
+    restart: unless-stopped
+    network_mode: host          # reach device IPs on the ICC-disabled bridge
+    privileged: true            # loop-mount per-device ext4 images
+    env_file: .env
+    environment:
+      AGENT_LISTEN_HOST: 127.0.0.1   # only Caddy can reach it
+      AGENT_LISTEN_PORT: 8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev:/dev
+      - type: bind
+        source: /data/devices
+        target: /data/devices
+        bind:
+          propagation: rshared   # loop mounts made here become visible to dockerd
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "3" }
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    network_mode: host          # binds :80 and :443 on the host
+    env_file: .env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - device-agent
+
+volumes:
+  caddy_data:
+  caddy_config:
